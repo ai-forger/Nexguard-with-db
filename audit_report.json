@@ -1,0 +1,72 @@
+{
+    "timestamp": "2025-11-29T22:15:00+05:30",
+    "environment": {
+        "os": "Windows",
+        "node": "v20.18.0",
+        "npm": "10.8.2",
+        "python": "3.12.6"
+    },
+    "checks": [
+        {
+            "id": "ENV_001",
+            "description": "Environment Variables",
+            "status": "PASS",
+            "evidence": "MONGO_URL, BLOCKFROST_API_KEY, GEMINI_API_KEY present in .env",
+            "remediation": null,
+            "confidence": "HIGH"
+        },
+        {
+            "id": "DB_001",
+            "description": "MongoDB Connectivity",
+            "status": "PASS",
+            "evidence": "Connected successfully. Collections 'tokens', 'auditlogs' found.",
+            "remediation": null,
+            "confidence": "HIGH"
+        },
+        {
+            "id": "BE_001",
+            "description": "Backend Static Analysis",
+            "status": "WARN",
+            "evidence": "npm run lint failed: Missing script 'lint'",
+            "remediation": "Add 'lint' script to package.json (e.g., 'eslint .')",
+            "confidence": "HIGH"
+        },
+        {
+            "id": "API_001",
+            "description": "API Functional Tests",
+            "status": "PASS",
+            "evidence": "Health, Mint, Explorer, Vote endpoints returned 200 OK.",
+            "remediation": null,
+            "confidence": "HIGH"
+        },
+        {
+            "id": "HYPE_001",
+            "description": "Hype Meter Microservice",
+            "status": "PASS",
+            "evidence": "Service reachable at http://localhost:8000/meter/{id}",
+            "remediation": null,
+            "confidence": "HIGH"
+        },
+        {
+            "id": "FE_001",
+            "description": "Frontend Build",
+            "status": "PASS",
+            "evidence": "Vite build completed successfully (Exit Code 0).",
+            "remediation": null,
+            "confidence": "HIGH"
+        },
+        {
+            "id": "FE_002",
+            "description": "Frontend Runtime",
+            "status": "PASS",
+            "evidence": "Dev server accessible at http://localhost:5173. Root and Routes return 200.",
+            "remediation": null,
+            "confidence": "HIGH"
+        }
+    ],
+    "summary": {
+        "status": "GREEN",
+        "issues": 0,
+        "warnings": 1
+    }
+}
