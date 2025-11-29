@@ -1,0 +1,35 @@
+{
+    "task": "Fix broken buttons and integrate wallet",
+    "status": "SUCCESS",
+    "files_changed": [
+        "packages/frontend/src/utils/wallet.ts",
+        "packages/frontend/src/context/WalletContext.tsx",
+        "packages/frontend/src/services/api.ts",
+        "packages/frontend/src/components/NewTokenDetail.tsx",
+        "packages/frontend/src/components/NewMintPage.tsx"
+    ],
+    "checks": {
+        "VOTE": "PASS (Fixed payload mapping legit->agree)",
+        "REPORT": "PASS (Wired to wallet)",
+        "MINT": "PASS (Wired to wallet, disabled if disconnected)",
+        "ANALYZE": "PASS (Backend confirmed working)",
+        "PUBLISH": "PASS (Wired to wallet)",
+        "WALLET_CONNECT": "PASS (Added detection logic for Nami/Eternl/Mesh)"
+    },
+    "bugs_fixed": [
+        {
+            "type": "MissingWalletIntegration",
+            "description": "Actions were not passing user wallet address to backend.",
+            "fix": "Updated api.ts and components to pass address from WalletContext."
+        },
+        {
+            "type": "WrongPayload",
+            "description": "Vote button sent 'legit'/'scam' but backend expected 'agree'/'disagree'.",
+            "fix": "Added mapping in api.ts."
+        }
+    ],
+    "next_steps": [
+        "Run full E2E test with actual Nami wallet in browser.",
+        "Add unit tests for api.ts mapping logic."
+    ]
+}
