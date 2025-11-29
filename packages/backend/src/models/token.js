@@ -11,7 +11,10 @@ const tokenSchema = new mongoose.Schema({
   isDisputed: { type: Boolean, default: false },
   source: { type: String, default: 'simulation' },
   // For meme factory
-  reports_count: { type: Number, default: 0 }
+  reports_count: { type: Number, default: 0 },
+  flags: { type: Array, default: [] },
+  riskLevel: { type: String, default: 'medium' },
+  priceChange24h: { type: Number, default: 0 }
 });
 
 module.exports = mongoose.model('Token', tokenSchema);

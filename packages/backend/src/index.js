@@ -68,8 +68,24 @@ function stopMemeFactory() {
     }
 }
 
-// Start factory automatically
-startMemeFactory();
+// Generate initial batch if DB is empty
+async function initializeMemeCoins() {
+    const tokens = await getAllTokens();
+    const memeTokens = tokens.filter(t => t.source === 'meme_factory');
+    if (memeTokens.length < 10) {
+        logger.info('Initializing Meme Factory with initial batch...');
+        const batch = generateBatch(10);
+        for (const coin of batch) {
+            await insertToken(coin);
+        }
+        logger.info(`Generated ${batch.length} initial meme coins`);
+    }
+}
+
+// Start factory automatically after initialization
+initializeMemeCoins().then(() => {
+    startMemeFactory();
+});
 
 // --- Blockfrost Real Tokens Cache ---
 let realTokensCache = [];
