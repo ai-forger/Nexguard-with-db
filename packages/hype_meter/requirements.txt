@@ -1,0 +1,9 @@
+pymongo
+python-dotenv
+blockfrost-python
+praw
+pandas
+scikit-learn
+fastapi
+uvicorn
+numpy

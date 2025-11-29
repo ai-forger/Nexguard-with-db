@@ -2,7 +2,7 @@ import axios from 'axios';
 import API_URL from '../apiConfig';
 
 // --- CONFIGURATION ---
-export const USE_REAL_BACKEND = true; // Toggle this to switch between Mock and Real API
+export const USE_REAL_BACKEND = false; // Toggle this to switch between Mock and Real API
 
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
@@ -111,6 +111,16 @@ const MockAPI = {
             { hash: '0x9b...3c1d', type: 'TOKEN MINT', amount: '1000 NEX', status: 'PENDING' },
             { hash: '0x7c...2a9e', type: 'ASSET SWAP', amount: '250 ADA', status: 'CONFIRMED' },
         ];
+    },
+    vote: async (_tokenId: string, _vote: string) => {
+        await delay(1000);
+        addLocalAudit('VOTE', 'Neo_Operator');
+        return { success: true };
+    },
+    report: async (_tokenId: string, _reason: string) => {
+        await delay(1000);
+        addLocalAudit('WHISTLEBLOWER_REPORT', 'Neo_Operator');
+        return { success: true };
     }
 };
 
@@ -170,12 +180,13 @@ const RealAPI = {
         addLocalAudit('MINT', 'Neo_Operator');
         return { success: true, policyId: res.data.policyId, txHash: "tx_" + res.data.tokenId };
     },
-    askMasumi: async (_id: string) => {
-        await delay(2500);
+    askMasumi: async (id: string) => {
+        const res = await axios.post(`${API_URL}/risk/${id}/ask-masumi`);
         addLocalAudit('RISK_ANALYSIS', 'Masumi_AI');
         return {
-            explanation: "Masumi AI Analysis: Pattern matches legitimate utility token distribution. Code similarity to verified projects is 98%.",
-            delta: "+5%"
+            explanation: res.data.explanation,
+            delta: res.data.risk_level === 'high' ? '-10%' : '+5%',
+            rug_probability: res.data.rug_probability
         };
     },
     getAudits: async () => {
@@ -197,10 +208,9 @@ const RealAPI = {
         return res.data;
     },
     generateIdentity: async () => {
-        // Mocking identity generation for now
-        await delay(1000);
-        addLocalAudit('IDENTITY_CREATE', 'Neo_Operator');
-        return { success: true, id: "identity_" + Math.random() };
+        const res = await axios.post(`${API_URL}/generate-meme-identity`, { seed: "user_" + Math.random() });
+        addLocalAudit('IDENTITY_CREATE', res.data.username || 'Neo_Operator');
+        return { success: true, id: res.data.username, ...res.data };
     },
     getBlocks: async () => {
         // Mocking blocks for now as backend might not have this endpoint yet
@@ -219,6 +229,16 @@ const RealAPI = {
             { hash: '0x9b...3c1d', type: 'TOKEN MINT', amount: '1000 NEX', status: 'PENDING' },
             { hash: '0x7c...2a9e', type: 'ASSET SWAP', amount: '250 ADA', status: 'CONFIRMED' },
         ];
+    },
+    vote: async (tokenId: string, vote: string) => {
+        const res = await axios.post(`${API_URL}/vote`, { tokenId, vote, voterId: 'Neo_Operator' });
+        addLocalAudit('VOTE', 'Neo_Operator');
+        return res.data;
+    },
+    report: async (tokenId: string, reason: string) => {
+        const res = await axios.post(`${API_URL}/report`, { tokenId, reportText: reason, reporterId: 'Neo_Operator' });
+        addLocalAudit('WHISTLEBLOWER_REPORT', 'Neo_Operator');
+        return res.data;
     }
 };
 

@@ -445,6 +445,13 @@ app.post('/api/vote', async (req, res) => {
         }
     }
 
+    await logAudit({
+        tokenId,
+        action: "VOTE",
+        actor: voterId || "anonymous",
+        info: `Voted ${vote} on ${tokenId}`
+    });
+
     res.json({ success: true, votes });
 });
 
@@ -696,9 +703,22 @@ app.post('/api/generate-meme-identity', async (req, res) => {
             await saveIdentity({ address: seed, ...identity });
         }
 
+        await logAudit({
+            action: "IDENTITY_CREATE",
+            actor: identity.username || "system",
+            info: `Generated identity for ${seed || 'random user'}`
+        });
+
         res.json(identity);
     } catch (error) {
         logger.error("Gemini Error", { error: error.message });
+
+        await logAudit({
+            action: "IDENTITY_CREATE",
+            actor: "FallbackDoge",
+            info: `Generated fallback identity for ${seed || 'random user'} (AI Failed)`
+        });
+
         res.status(500).json({ username: "FallbackDoge", astrology: "AI is sleeping.", traits: [] });
     }
 });
@@ -784,6 +804,13 @@ app.post('/risk/:policyId/ask-masumi', async (req, res) => {
         const decision_hash = crypto.createHash('sha256').update(summary).digest('hex');
 
         console.log(`[API] ✓ Analysis complete. Rug probability: ${rugProbability}%`);
+
+        await logAudit({
+            tokenId: policyId,
+            action: "RISK_ANALYSIS",
+            actor: "Masumi_AI",
+            info: `Risk Analysis: ${rugProbability}% Rug Probability`
+        });
 
         // Return comprehensive response
         res.json({

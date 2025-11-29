@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import { ShieldAlert, Terminal, Cpu, TrendingUp, AlertTriangle, Zap, Copy } from 'lucide-react';
 import { Button, Card } from './CyberTheme';
 import { API } from '../services/api';
+import { HypeMeterWidget } from './HypeMeterWidget';
 
 const TrustGauge = ({ score }: { score: number }) => {
     const radius = 50;
@@ -59,6 +60,22 @@ export const TokenDetailPage = () => {
         const res = await API.askMasumi(policyId || '');
         setAnalysis(res);
         setAnalyzing(false);
+    };
+
+    const handleVote = async (vote: 'legit' | 'scam') => {
+        console.log(`[Frontend] Voting: ${vote}`);
+        // Optimistic UI update could go here
+        await API.vote(policyId || '', vote);
+        alert(`Voted ${vote.toUpperCase()}!`);
+    };
+
+    const handleReport = async () => {
+        console.log("[Frontend] Reporting...");
+        const reason = prompt("Enter reason for reporting:");
+        if (reason) {
+            await API.report(policyId || '', reason);
+            alert("Report submitted successfully.");
+        }
     };
 
     if (loading) return <div className="p-10 text-center text-emerald-500 font-mono animate-pulse">ESTABLISHING SECURE UPLINK...</div>;
@@ -154,19 +171,22 @@ export const TokenDetailPage = () => {
                 </Card>
 
                 <div className="space-y-6">
+                    {/* Hype Meter Widget */}
+                    <HypeMeterWidget tokenId={policyId || "CLOWN_TOKEN"} />
+
                     <Card>
                         <h3 className="font-bold text-emerald-500/70 mb-4 font-brand uppercase tracking-wider text-sm">Community Actions</h3>
                         <div className="grid grid-cols-2 gap-4 mb-4">
-                            <Button variant="success" className="h-24 flex-col gap-1 border-emerald-500/20 hover:border-emerald-500">
+                            <Button variant="success" className="h-24 flex-col gap-1 border-emerald-500/20 hover:border-emerald-500" onClick={() => handleVote('legit')}>
                                 <TrendingUp size={24} />
                                 <span>LEGIT</span>
                             </Button>
-                            <Button variant="danger" className="h-24 flex-col gap-1">
+                            <Button variant="danger" className="h-24 flex-col gap-1" onClick={() => handleVote('scam')}>
                                 <AlertTriangle size={24} />
                                 <span>SCAM</span>
                             </Button>
                         </div>
-                        <Button variant="secondary" fullWidth className="border-red-500/30 text-red-400 hover:bg-red-500/10 hover:border-red-500">
+                        <Button variant="secondary" fullWidth className="border-red-500/30 text-red-400 hover:bg-red-500/10 hover:border-red-500" onClick={handleReport}>
                             <span className="flex items-center gap-2"><Zap size={16} /> REPORT ANOMALY</span>
                         </Button>
                     </Card>
